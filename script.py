@@ -61,6 +61,7 @@ def main(cf):
             accs = model.test_epoch(img_batches, label_batches)
             print(f"average accuracy {np.mean(np.array(accs))}")
 
+            np.random.seed(20)
             perm = np.random.permutation(img_train.shape[1])
             img_train = img_train[:, perm]
             label_train = label_train[:, perm]

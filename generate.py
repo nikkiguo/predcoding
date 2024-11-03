@@ -61,6 +61,7 @@ def main(cf):
             pred_imgs = model.generate_data(label_batches[0])
             mnist_utils.plot_imgs(pred_imgs, cf.img_path.format(epoch))
 
+            np.random.seed(20)
             perm = np.random.permutation(img_train.shape[1])
             img_train = img_train[:, perm]
             label_train = label_train[:, perm]

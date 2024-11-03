@@ -174,6 +174,7 @@ class PredictiveCodingNetwork(object):
             else:
                 raise ValueError(f"{self.act_fn} not supported")
 
+            np.random.seed(20)
             layer_w = np.random.uniform(-1, 1, size=(self.neurons[l + 1], self.neurons[l])) * norm_w
             layer_b = np.zeros((self.neurons[l + 1], 1)) + norm_b * np.ones((self.neurons[l + 1], 1))
             weights[l] = set_tensor(layer_w, self.device)
