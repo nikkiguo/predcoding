@@ -1,0 +1,62 @@
+epoch 0
+training on 469 batches of size 128
+testing on 79 batches of size 128
+average accuracy 0.46924446202531644
+
+epoch 1
+training on 469 batches of size 128
+testing on 79 batches of size 128
+average accuracy 0.7423852848101266
+
+epoch 2
+training on 469 batches of size 128
+testing on 79 batches of size 128
+average accuracy 0.7052017405063291
+
+epoch 3
+training on 469 batches of size 128
+testing on 79 batches of size 128
+average accuracy 0.7678006329113924
+
+epoch 4
+training on 469 batches of size 128
+testing on 79 batches of size 128
+average accuracy 0.4475870253164557
+
+epoch 5
+training on 469 batches of size 128
+testing on 79 batches of size 128
+average accuracy 0.7621637658227848
+
+epoch 6
+training on 469 batches of size 128
+testing on 79 batches of size 128
+average accuracy 0.814181170886076
+
+epoch 7
+training on 469 batches of size 128
+testing on 79 batches of size 128
+average accuracy 0.833564082278481
+
+epoch 8
+training on 469 batches of size 128
+testing on 79 batches of size 128
+average accuracy 0.8239715189873418
+
+epoch 9
+training on 469 batches of size 128
+testing on 79 batches of size 128
+average accuracy 0.814873417721519
+
+Training Metrics Summary:
+  Epoch Training Batches Testing Batches  Avg Accuracy
+0     0               79              79      0.469244
+1     1               79              79      0.742385
+2     2               79              79      0.705202
+3     3               79              79      0.767801
+4     4               79              79      0.447587
+5     5               79              79      0.762164
+6     6               79              79      0.814181
+7     7               79              79      0.833564
+8     8               79              79      0.823972
+9     9               79              79      0.814873
