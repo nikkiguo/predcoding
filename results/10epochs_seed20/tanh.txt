@@ -1,0 +1,49 @@
+epoch 0
+training on 469 batches of size 128
+testing on 79 batches of size 128
+average accuracy 0.41544699367088606
+
+epoch 1
+training on 469 batches of size 128
+testing on 79 batches of size 128
+average accuracy 0.8880537974683544
+
+epoch 2
+training on 469 batches of size 128
+testing on 79 batches of size 128
+average accuracy 0.8927017405063291
+
+epoch 3
+training on 469 batches of size 128
+testing on 79 batches of size 128
+average accuracy 0.9137658227848101
+
+epoch 4
+training on 469 batches of size 128
+testing on 79 batches of size 128
+average accuracy 0.9155458860759493
+
+epoch 5
+training on 469 batches of size 128
+testing on 79 batches of size 128
+average accuracy 0.9335443037974683
+
+epoch 6
+training on 469 batches of size 128
+testing on 79 batches of size 128
+average accuracy 0.9442246835443038
+
+epoch 7
+training on 469 batches of size 128
+testing on 79 batches of size 128
+average accuracy 0.9403678797468354
+
+epoch 8
+training on 469 batches of size 128
+testing on 79 batches of size 128
+average accuracy 0.9439280063291139
+
+epoch 9
+training on 469 batches of size 128
+testing on 79 batches of size 128
+average accuracy 0.9362143987341772
