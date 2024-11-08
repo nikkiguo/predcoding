@@ -70,7 +70,7 @@ def main(cf):
 if __name__ == "__main__":
     cf = AttrDict()
 
-    cf.n_epochs = 100
+    cf.n_epochs = 10
     cf.data_size = None
     cf.batch_size = 128
 
@@ -81,7 +81,7 @@ if __name__ == "__main__":
 
     cf.neurons = [784, 500, 500, 10]
     cf.n_layers = len(cf.neurons)
-    cf.act_fn = F.TANH
+    cf.act_fn = F.LINEAR
     cf.var_out = 1
     cf.vars = torch.ones(cf.n_layers)
 

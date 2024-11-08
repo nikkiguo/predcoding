@@ -25,7 +25,7 @@ def f(x, act_fn):
 def f_deriv(x, act_fn):
     """ (activation_size, batch_size) """
     if act_fn is LINEAR:
-        deriv = np.ones(x.shape)
+        deriv = torch.ones(x.shape)
     elif act_fn is TANH:
         deriv = torch.ones_like(x) - torch.tanh(x) ** 2
     elif act_fn is LOGSIG:
