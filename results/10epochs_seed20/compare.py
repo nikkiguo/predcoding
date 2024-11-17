@@ -16,7 +16,7 @@ x = list(range(0, N_EPOCHS))
 
 # Plot each line
 plt.plot(x, tanh, label="tanh", color="blue", marker="o")
-plt.plot(x, logsig, label="logsig", color="green", marker="o")
+plt.plot(x, logsig, label="sigmoid", color="green", marker="o")
 plt.plot(x, linear, label="linear", color="red", marker="o")
 
 # Customize the plot

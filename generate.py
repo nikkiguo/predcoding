@@ -42,7 +42,7 @@ def main(cf):
         label_train = mnist_utils.scale_labels(label_train, cf.label_scale)
         label_test = mnist_utils.scale_labels(label_test, cf.label_scale)
 
-    if cf.apply_inv:
+    if cf.apply_inv and cf.act_fn != F.RELU:
         img_train = F.f_inv(img_train, cf.act_fn)
         img_test = F.f_inv(img_test, cf.act_fn)
 
@@ -72,7 +72,7 @@ if __name__ == "__main__":
 
     cf.img_path = "imgs/{}.png"
 
-    cf.n_epochs = 100
+    cf.n_epochs = 10
     cf.data_size = None
     cf.batch_size = 128
 
@@ -83,7 +83,7 @@ if __name__ == "__main__":
 
     cf.neurons = [10, 500, 500, 784]
     cf.n_layers = len(cf.neurons)
-    cf.act_fn = F.TANH
+    cf.act_fn = F.RELU
     cf.var_out = 1
     cf.vars = torch.ones(cf.n_layers)
 

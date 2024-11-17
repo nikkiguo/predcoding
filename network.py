@@ -171,6 +171,10 @@ class PredictiveCodingNetwork(object):
                 norm_w = np.sqrt(6 / (self.neurons[l + 1] + self.neurons[l]))
             elif self.act_fn is F.LOGSIG:
                 norm_w = 4 * np.sqrt(6 / (self.neurons[l + 1] + self.neurons[l]))
+            elif self.act_fn is F.RELU:
+                norm_w = np.sqrt(2 / self.neurons[l]) # he initialization
+            elif self.act_fn is F.LEAKY_RELU:
+                norm_w = np.sqrt(2 / (1 + F.L_RELU_SLOPE) * 1 / self.neurons[l])  # Adjusted He initialization
             else:
                 raise ValueError(f"{self.act_fn} not supported")
 
