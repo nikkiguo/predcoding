@@ -1,42 +1,42 @@
 epoch 0
 training on 469 batches of size 128
 testing on 79 batches of size 128
-average accuracy 0.9650909810126582
+average accuracy 0.9649920886075949
 
 epoch 1
 training on 469 batches of size 128
 testing on 79 batches of size 128
-average accuracy 0.9728045886075949
+average accuracy 0.9735957278481012
 
 epoch 2
 training on 469 batches of size 128
 testing on 79 batches of size 128
-average accuracy 0.9749802215189873
+average accuracy 0.9751780063291139
 
 epoch 3
 training on 469 batches of size 128
 testing on 79 batches of size 128
-average accuracy 0.9775514240506329
+average accuracy 0.9768591772151899
 
 epoch 4
 training on 469 batches of size 128
 testing on 79 batches of size 128
-average accuracy 0.9768591772151899
+average accuracy 0.9784414556962026
 
 epoch 5
 training on 469 batches of size 128
 testing on 79 batches of size 128
-average accuracy 0.9773536392405063
+average accuracy 0.9781447784810127
 
 epoch 6
 training on 469 batches of size 128
 testing on 79 batches of size 128
-average accuracy 0.9783425632911392
+average accuracy 0.9791337025316456
 
 epoch 7
 training on 469 batches of size 128
 testing on 79 batches of size 128
-average accuracy 0.9770569620253164
+average accuracy 0.9773536392405063
 
 epoch 8
 training on 469 batches of size 128
@@ -46,4 +46,4 @@ average accuracy 0.9770569620253164
 epoch 9
 training on 469 batches of size 128
 testing on 79 batches of size 128
-average accuracy 0.9761669303797469
+average accuracy 0.9766613924050633
