@@ -99,7 +99,7 @@ if __name__ == "__main__":
     cf.batch_size = 128
     cf.seed = 20
     cf.percent_data_used = 0.2
-    cf.subsample_idx = 1
+    cf.subsample_idx = 0 # e.g. subsample_idx = 0, 1, 2, 3, 4 when percent_data_used = 0.2
 
     cf.apply_inv = True
     cf.apply_scaling = True
