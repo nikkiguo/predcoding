@@ -4,7 +4,7 @@
 import numpy as np
 import torch
 
-import mnist_utils
+import dataset_utils
 import functions as F
 from network import PredictiveCodingNetwork
 
@@ -16,14 +16,14 @@ class AttrDict(dict):
 
 def main(cf):
     print(f"device [{cf.device}]")
-    print("loading MNIST data...")
-    train_set = mnist_utils.get_mnist_train_set()
-    test_set = mnist_utils.get_mnist_test_set()
+    print("loading {cf.dataset_name} data...")
+    train_set = dataset_utils.get_train_set(cf.dataset_name)
+    test_set = dataset_utils.get_test_set(cf.dataset_name)
 
-    img_train = mnist_utils.get_imgs(train_set)
-    img_test = mnist_utils.get_imgs(test_set)
-    label_train = mnist_utils.get_labels(train_set)
-    label_test = mnist_utils.get_labels(test_set)
+    img_train = dataset_utils.get_imgs(cf.dataset_name, train_set)
+    img_test = dataset_utils.get_imgs(cf.dataset_name, test_set)
+    label_train = dataset_utils.get_labels(train_set)
+    label_test = dataset_utils.get_labels(test_set)
 
     if cf.data_size is not None:
         test_size = cf.data_size // 5
@@ -37,10 +37,10 @@ def main(cf):
 
     print("performing preprocessing...")
     if cf.apply_scaling:
-        img_train = mnist_utils.scale_imgs(img_train, cf.img_scale)
-        img_test = mnist_utils.scale_imgs(img_test, cf.img_scale)
-        label_train = mnist_utils.scale_labels(label_train, cf.label_scale)
-        label_test = mnist_utils.scale_labels(label_test, cf.label_scale)
+        img_train = dataset_utils.scale_imgs(img_train, cf.img_scale)
+        img_test = dataset_utils.scale_imgs(img_test, cf.img_scale)
+        label_train = dataset_utils.scale_labels(label_train, cf.label_scale)
+        label_test = dataset_utils.scale_labels(label_test, cf.label_scale)
 
     if cf.apply_inv and cf.act_fn != F.RELU:
         img_train = F.f_inv(img_train, cf.act_fn)
@@ -52,16 +52,24 @@ def main(cf):
         for epoch in range(cf.n_epochs):
             print(f"\nepoch {epoch}")
 
-            img_batches, label_batches = mnist_utils.get_batches(img_train, label_train, cf.batch_size)
+<<<<<<< HEAD
+            img_batches, label_batches = dataset_utils.get_batches(img_train, label_train, cf.batch_size)
             print(f"training on {len(img_batches)} batches of size {cf.batch_size}")
             model.train_epoch(label_batches, img_batches, epoch_num=epoch)
 
-            img_batches, label_batches = mnist_utils.get_batches(img_test, label_test, cf.batch_size)
+            img_batches, label_batches = dataset_utils.get_batches(img_test, label_test, cf.batch_size)
+=======
+            img_batches, label_batches = mnist_utils.get_batches(img_train, label_train, cf.batch_size, cf.percent_data_used)
+            print(f"training on {len(img_batches)} batches of size {cf.batch_size}")
+            model.train_epoch(label_batches, img_batches, epoch_num=epoch)
+
+            img_batches, label_batches = mnist_utils.get_batches(img_test, label_test, cf.batch_size, cf.percent_data_used)
+>>>>>>> be1f9e580febd661718da45a2611324acdc95bd2
             print("generating images...")
             pred_imgs = model.generate_data(label_batches[0])
-            mnist_utils.plot_imgs(pred_imgs, cf.img_path.format(epoch))
+            dataset_utils.plot_imgs(cf.dataset_name, pred_imgs, cf.img_path.format(epoch))
 
-            np.random.seed(20)
+            np.random.seed(cf.seed)
             perm = np.random.permutation(img_train.shape[1])
             img_train = img_train[:, perm]
             label_train = label_train[:, perm]
@@ -80,6 +88,12 @@ if __name__ == "__main__":
 
     cf.img_path = "imgs/{}.png"
     cf.img_path_og = "imgs/{}_og.png"
+<<<<<<< HEAD
+    cf.dataset_name = "MNIST"
+=======
+    cf.seed = 20
+    cf.percent_data_used = 0.2
+>>>>>>> be1f9e580febd661718da45a2611324acdc95bd2
 
     cf.n_epochs = 10
     cf.data_size = None

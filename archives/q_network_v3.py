@@ -4,7 +4,7 @@
 import numpy as np
 import torch
 
-import mnist_utils
+import dataset_utils
 import functions as F
 
 
@@ -119,7 +119,7 @@ class QCodingNetwork(object):
 
             x, errors, q_errors, its = self.hybrid_infer(x, batch_size, itr_max=itr_max, test=True)
             pred_labels = x[0]
-            acc = mnist_utils.mnist_accuracy(pred_labels, label_batch)
+            acc = dataset_utils.mnist_accuracy(pred_labels, label_batch)
             accs.append(acc)
             avg_itr += its
         return accs, avg_itr / n_batches
@@ -143,7 +143,7 @@ class QCodingNetwork(object):
 
             x, errors, its = self.infer(x, batch_size, itr_max=itr_max, test=True)
             pred_y = x[0]
-            acc = mnist_utils.mnist_accuracy(pred_y, y_batch)
+            acc = dataset_utils.mnist_accuracy(pred_y, y_batch)
             accs.append(acc)
             avg_itr += its
         return accs, avg_itr / n_batches
@@ -161,7 +161,7 @@ class QCodingNetwork(object):
                 b_q = self.b_q[l - 1].repeat(1, batch_size)
                 q[l] = self.W_q[l - 1] @ F.f(q[l - 1], self.act_fn) + b_q
             pred_y = q[-1]
-            acc = mnist_utils.mnist_accuracy(pred_y, y_batch)
+            acc = dataset_utils.mnist_accuracy(pred_y, y_batch)
             accs.append(acc)
         return accs
 

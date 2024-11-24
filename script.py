@@ -3,8 +3,13 @@
 
 import numpy as np
 import torch
+<<<<<<< HEAD
 
+import dataset_utils
+=======
+import os
 import mnist_utils
+>>>>>>> be1f9e580febd661718da45a2611324acdc95bd2
 import functions as F
 from network import PredictiveCodingNetwork
 import argparse
@@ -17,11 +22,20 @@ class AttrDict(dict):
 
 def main(cf):
     print(f"device [{cf.device}]")
+    print(f"dataset: {cf.dataset_name}")
+    train_set = dataset_utils.get_train_set(cf.dataset_name)
+    test_set = dataset_utils.get_test_set(cf.dataset_name)
     
-    if not cf.dataset or cf.dataset == "mnist":
+<<<<<<< HEAD
+    img_train = dataset_utils.get_imgs(cf.dataset_name, train_set)
+    img_test = dataset_utils.get_imgs(cf.dataset_name, test_set)
+    label_train = dataset_utils.get_labels(train_set)
+    label_test = dataset_utils.get_labels(test_set)
+=======
+    if cf.dataset == "mnist":
         print("loading MNIST data...")
-        train_set = mnist_utils.get_fashion_mnist_train_set()
-        test_set = mnist_utils.get_fashion_mnist_test_set()
+        train_set = mnist_utils.get_mnist_train_set()
+        test_set = mnist_utils.get_mnist_test_set()
     elif cf.dataset == "fashion_mnist":
         print("loading Fashion MNIST data...")
         train_set = mnist_utils.get_fashion_mnist_train_set()
@@ -32,6 +46,7 @@ def main(cf):
     img_test = mnist_utils.get_imgs(test_set)
     label_train = mnist_utils.get_labels(train_set)
     label_test = mnist_utils.get_labels(test_set)
+>>>>>>> be1f9e580febd661718da45a2611324acdc95bd2
     
 
     if cf.data_size is not None:
@@ -46,10 +61,10 @@ def main(cf):
 
     print("performing preprocessing...")
     if cf.apply_scaling:
-        img_train = mnist_utils.scale_imgs(img_train, cf.img_scale)
-        img_test = mnist_utils.scale_imgs(img_test, cf.img_scale)
-        label_train = mnist_utils.scale_labels(label_train, cf.label_scale)
-        label_test = mnist_utils.scale_labels(label_test, cf.label_scale)
+        img_train = dataset_utils.scale_imgs(img_train, cf.img_scale)
+        img_test = dataset_utils.scale_imgs(img_test, cf.img_scale)
+        label_train = dataset_utils.scale_labels(label_train, cf.label_scale)
+        label_test = dataset_utils.scale_labels(label_test, cf.label_scale)
 
     if cf.apply_inv and cf.act_fn != F.RELU:
         img_train = F.f_inv(img_train, cf.act_fn)
@@ -61,19 +76,33 @@ def main(cf):
         for epoch in range(cf.n_epochs):
             print(f"\nepoch {epoch}")
 
-            img_batches, label_batches = mnist_utils.get_batches(img_train, label_train, cf.batch_size)
+<<<<<<< HEAD
+            img_batches, label_batches = dataset_utils.get_batches(img_train, label_train, cf.batch_size)
             print(f"training on {len(img_batches)} batches of size {cf.batch_size}")
             model.train_epoch(img_batches, label_batches, epoch_num=epoch)
 
-            img_batches, label_batches = mnist_utils.get_batches(img_test, label_test, cf.batch_size)
+            img_batches, label_batches = dataset_utils.get_batches(img_test, label_test, cf.batch_size)
+=======
+            img_batches, label_batches = mnist_utils.get_batches(img_train, label_train, cf.batch_size, cf.percent_data_used, cf.subsample_idx)
+            print(f"training on {len(img_batches)} batches of size {cf.batch_size}")
+            model.train_epoch(img_batches, label_batches, epoch_num=epoch)
+
+            img_batches, label_batches = mnist_utils.get_batches(img_test, label_test, cf.batch_size, cf.percent_data_used, cf.subsample_idx)
+>>>>>>> be1f9e580febd661718da45a2611324acdc95bd2
             print(f"testing on {len(img_batches)} batches of size {cf.batch_size}")
             accs = model.test_epoch(img_batches, label_batches)
             print(f"average accuracy {np.mean(np.array(accs))}")
 
-            np.random.seed(20)
+            np.random.seed(cf.seed)
             perm = np.random.permutation(img_train.shape[1])
             img_train = img_train[:, perm]
             label_train = label_train[:, perm]
+
+    # Save model state_dict
+    filepath = "models/"
+    filename = f'net_{cf.dataset}_{cf.act_fn}_{cf.optim}_seed{cf.seed}_samplsize{cf.percent_data_used}_samplidx{cf.subsample_idx}.pth'
+    full_path = os.path.join(filepath, filename)
+    model.save(full_path)
 
 
 if __name__ == "__main__":
@@ -88,24 +117,39 @@ if __name__ == "__main__":
     
     cf = AttrDict()
 
-    cf.n_epochs = 10
+    cf.n_epochs = 16
     cf.data_size = None
     cf.batch_size = 128
+    cf.seed = 20
+    cf.percent_data_used = 0.2
+    cf.subsample_idx = 0 # e.g. subsample_idx = 0, 1, 2, 3, 4 when percent_data_used = 0.2
 
     cf.apply_inv = True
     cf.apply_scaling = True
     cf.label_scale = 0.94
     cf.img_scale = 1.0
+<<<<<<< HEAD
 
+    # Dataset arg names: MNIST, FASHION_MNIST, CIFAR10
     if not args.data: # default is mnist
-        cf.dataset = "mnist"
+        cf.dataset_name = "MNIST"
     else:
-        cf.dataset = args.data # "mnist" or "fashion_mnist" or "cifar10"
+        cf.dataset_name = args.data # "MNIST" or "FASHION_MNIST" or "CIFAR10"
+
+
+    cf.neurons = [784, 500, 500, 10]
+        
+=======
+    
+    if (not args.data) or (args.data == "mnist"): # default is mnist
+        cf.dataset = "mnist"
+    elif args.data == "fashion_mnist":
+        cf.dataset = args.data
+        
     # elif args.data == "cifar10":
     #     print("Using cifar10 dataset")
-
     cf.neurons = [784, 128, 128, 128, 10]
-        
+>>>>>>> be1f9e580febd661718da45a2611324acdc95bd2
     cf.n_layers = len(cf.neurons)
     cf.act_fn = F.RELU
     cf.var_out = 1
