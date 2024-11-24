@@ -7,6 +7,7 @@ import os
 import mnist_utils
 import functions as F
 from network import PredictiveCodingNetwork
+import argparse
 
 
 class AttrDict(dict):
@@ -16,14 +17,22 @@ class AttrDict(dict):
 
 def main(cf):
     print(f"device [{cf.device}]")
-    print("loading MNIST data...")
-    train_set = mnist_utils.get_mnist_train_set()
-    test_set = mnist_utils.get_mnist_test_set()
+    
+    if not cf.dataset or cf.dataset == "mnist":
+        print("loading MNIST data...")
+        train_set = mnist_utils.get_fashion_mnist_train_set()
+        test_set = mnist_utils.get_fashion_mnist_test_set()
+    elif cf.dataset == "fashion_mnist":
+        print("loading Fashion MNIST data...")
+        train_set = mnist_utils.get_fashion_mnist_train_set()
+        test_set = mnist_utils.get_fashion_mnist_test_set()
+
 
     img_train = mnist_utils.get_imgs(train_set)
     img_test = mnist_utils.get_imgs(test_set)
     label_train = mnist_utils.get_labels(train_set)
     label_test = mnist_utils.get_labels(test_set)
+    
 
     if cf.data_size is not None:
         test_size = cf.data_size // 5
@@ -74,6 +83,15 @@ def main(cf):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    # Add arguments
+    parser.add_argument("--data", type=str)
+    parser.add_argument("--o", type=str, help="Optimizer name")
+    parser.add_argument("--af", type=str, help="Activation function name")
+
+    # Parse the arguments
+    args = parser.parse_args()
+    
     cf = AttrDict()
 
     cf.n_epochs = 1
@@ -88,7 +106,15 @@ if __name__ == "__main__":
     cf.label_scale = 0.94
     cf.img_scale = 1.0
 
-    cf.neurons = [784, 500, 500, 10]
+    if not args.data: # default is mnist
+        cf.dataset = "mnist"
+    else:
+        cf.dataset = args.data # "mnist" or "fashion_mnist" or "cifar10"
+    # elif args.data == "cifar10":
+    #     print("Using cifar10 dataset")
+
+    cf.neurons = [784, 128, 128, 128, 10]
+        
     cf.n_layers = len(cf.neurons)
     cf.act_fn = F.RELU
     cf.var_out = 1
