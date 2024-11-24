@@ -3,10 +3,9 @@
 
 import numpy as np
 import torch
-import os, pickle
+import pickle
 import mnist_utils
 import functions as F
-from network import PredictiveCodingNetwork
 
 def load(filepath):
     with open(filepath, 'rb') as f:
@@ -22,55 +21,37 @@ class AttrDict(dict):
 def main(cf):
     print(f"device [{cf.device}]")
     print("loading MNIST data...")
-    train_set = mnist_utils.get_mnist_train_set()
     test_set = mnist_utils.get_mnist_test_set()
 
-    img_train = mnist_utils.get_imgs(train_set)
     img_test = mnist_utils.get_imgs(test_set)
-    label_train = mnist_utils.get_labels(train_set)
     label_test = mnist_utils.get_labels(test_set)
 
     if cf.data_size is not None:
         test_size = cf.data_size // 5
-        img_train = img_train[:, 0 : cf.data_size]
-        label_train = label_train[:, 0 : cf.data_size]
         img_test = img_test[:, 0:test_size]
         label_test = label_test[:, 0:test_size]
 
-    msg = "img_train {} img_test {} label_train {} label_test {}"
-    print(msg.format(img_train.shape, img_test.shape, label_train.shape, label_test.shape))
+    msg = "img_test {} label_test {}"
+    print(msg.format(img_test.shape, label_test.shape))
 
     print("performing preprocessing...")
     if cf.apply_scaling:
-        img_train = mnist_utils.scale_imgs(img_train, cf.img_scale)
         img_test = mnist_utils.scale_imgs(img_test, cf.img_scale)
-        label_train = mnist_utils.scale_labels(label_train, cf.label_scale)
         label_test = mnist_utils.scale_labels(label_test, cf.label_scale)
 
     if cf.apply_inv and cf.act_fn != F.RELU:
-        img_train = F.f_inv(img_train, cf.act_fn)
         img_test = F.f_inv(img_test, cf.act_fn)
 
-    model = PredictiveCodingNetwork(cf)
-    model = load('models/net_RELU_ADAM.pth')
+    model = load('models/net_RELU_ADAM_seed20_samplsize0.2_samplidx1.pth')
 
     with torch.no_grad():
         for epoch in range(cf.n_epochs):
             print(f"\nepoch {epoch}")
 
-            #img_batches, label_batches = mnist_utils.get_batches(img_train, label_train, cf.batch_size)
-            #print(f"training on {len(img_batches)} batches of size {cf.batch_size}")
-            #model.train_epoch(img_batches, label_batches, epoch_num=epoch)
-
-            img_batches, label_batches = mnist_utils.get_batches(img_test, label_test, cf.batch_size)
+            img_batches, label_batches = mnist_utils.get_batches(img_test, label_test, cf.batch_size, cf.percent_data_used, cf.subsample_idx)
             print(f"testing on {len(img_batches)} batches of size {cf.batch_size}")
             accs = model.test_epoch(img_batches, label_batches)
             print(f"average accuracy {np.mean(np.array(accs))}")
-
-            #np.random.seed(cf.seed)
-            #perm = np.random.permutation(img_train.shape[1])
-            #img_train = img_train[:, perm]
-            #label_train = label_train[:, perm]
 
 
 
@@ -81,6 +62,8 @@ if __name__ == "__main__":
     cf.data_size = None
     cf.batch_size = 128
     cf.seed = 20
+    cf.percent_data_used = 0.2
+    cf.subsample_idx = 0
 
     cf.apply_inv = True
     cf.apply_scaling = True

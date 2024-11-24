@@ -18,10 +18,10 @@ class AttrDict(dict):
 def main(cf):
     print(f"device [{cf.device}]")
     
-    if not cf.dataset or cf.dataset == "mnist":
+    if cf.dataset == "mnist":
         print("loading MNIST data...")
-        train_set = mnist_utils.get_fashion_mnist_train_set()
-        test_set = mnist_utils.get_fashion_mnist_test_set()
+        train_set = mnist_utils.get_mnist_train_set()
+        test_set = mnist_utils.get_mnist_test_set()
     elif cf.dataset == "fashion_mnist":
         print("loading Fashion MNIST data...")
         train_set = mnist_utils.get_fashion_mnist_train_set()
@@ -77,7 +77,7 @@ def main(cf):
 
     # Save model state_dict
     filepath = "models/"
-    filename = f'net_{cf.act_fn}_{cf.optim}_seed{cf.seed}_samplsize{cf.percent_data_used}_samplidx{cf.subsample_idx}.pth'
+    filename = f'net_{cf.dataset}_{cf.act_fn}_{cf.optim}_seed{cf.seed}_samplsize{cf.percent_data_used}_samplidx{cf.subsample_idx}.pth'
     full_path = os.path.join(filepath, filename)
     model.save(full_path)
 
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     
     cf = AttrDict()
 
-    cf.n_epochs = 1
+    cf.n_epochs = 16
     cf.data_size = None
     cf.batch_size = 128
     cf.seed = 20
@@ -106,15 +106,15 @@ if __name__ == "__main__":
     cf.label_scale = 0.94
     cf.img_scale = 1.0
 
-    if not args.data: # default is mnist
+    if (not args.data) or (args.data == "mnist"): # default is mnist
         cf.dataset = "mnist"
-    else:
-        cf.dataset = args.data # "mnist" or "fashion_mnist" or "cifar10"
+        cf.neurons = [784, 500, 500, 10]
+    elif args.data == "fashion_mnist":
+        cf.dataset = args.data
+        cf.neurons = [784, 128, 128, 128, 10]
     # elif args.data == "cifar10":
     #     print("Using cifar10 dataset")
 
-    cf.neurons = [784, 500, 500, 10]
-        
     cf.n_layers = len(cf.neurons)
     cf.act_fn = F.RELU
     cf.var_out = 1
