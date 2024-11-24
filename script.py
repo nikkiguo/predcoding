@@ -94,7 +94,7 @@ if __name__ == "__main__":
     
     cf = AttrDict()
 
-    cf.n_epochs = 1
+    cf.n_epochs = 10
     cf.data_size = None
     cf.batch_size = 128
     cf.seed = 20

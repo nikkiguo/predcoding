@@ -45,43 +45,46 @@ class PredictiveCodingNetwork(object):
         self._init_params()
 
     def train_epoch(self, x_batches, y_batches, epoch_num=None):
+        
         total_loss = 0.0
         step_losses = []  # List to store loss per step
         n_batches = len(x_batches)
-        for batch_id, (x_batch, y_batch) in enumerate(zip(x_batches, y_batches)):
 
-            if batch_id % 500 == 0 and batch_id > 0:
-                print(f"batch {batch_id}")
+        with open("training_log.txt", "a") as log_file:
+            for batch_id, (x_batch, y_batch) in enumerate(zip(x_batches, y_batches)):
 
-            x_batch = set_tensor(x_batch, self.device)
-            y_batch = set_tensor(y_batch, self.device)
-            batch_size = x_batch.size(1)
+                if batch_id % 500 == 0 and batch_id > 0:
+                    print(f"batch {batch_id}")
 
-            x = [[] for _ in range(self.n_layers)]
-            x[0] = x_batch
-            for l in range(1, self.n_layers):
-                b = self.b[l - 1].repeat(1, batch_size)
-                x[l] = self.W[l - 1] @ F.f(x[l - 1], self.act_fn) + b
-            x[self.n_layers - 1] = y_batch
+                x_batch = set_tensor(x_batch, self.device)
+                y_batch = set_tensor(y_batch, self.device)
+                batch_size = x_batch.size(1)
 
-            x, errors, _ = self.infer(x, batch_size)
+                x = [[] for _ in range(self.n_layers)]
+                x[0] = x_batch
+                for l in range(1, self.n_layers):
+                    b = self.b[l - 1].repeat(1, batch_size)
+                    x[l] = self.W[l - 1] @ F.f(x[l - 1], self.act_fn) + b
+                x[self.n_layers - 1] = y_batch
 
-            batch_loss = 0.0
-            for l in range(1, self.n_layers):
-                batch_loss += torch.mean(errors[l] ** 2)  # Mean Squared Ereror
+                x, errors, _ = self.infer(x, batch_size)
 
-            total_loss += batch_loss.item()
-            step_losses.append(batch_loss.item())
+                batch_loss = 0.0
+                for l in range(1, self.n_layers):
+                    batch_loss += torch.mean(errors[l] ** 2)  # Mean Squared Ereror
+
+                total_loss += batch_loss.item()
+                step_losses.append(batch_loss.item())
 
 
-            self.update_params(
-                x, errors, batch_size, epoch_num=epoch_num, n_batches=n_batches, curr_batch=batch_id
-            )
+                self.update_params(
+                    x, errors, batch_size, epoch_num=epoch_num, n_batches=n_batches, curr_batch=batch_id
+                )
 
-        average_loss = total_loss / n_batches
-        print(f"Epoch {epoch_num}: Average Loss = {average_loss:.6f}")
+            average_loss = total_loss / n_batches
+            log_file.write(f"Epoch {epoch_num}: Average Loss = {average_loss:.6f}")
 
-        print(f"Step losses: {step_losses}")
+            log_file.write(f"Step losses: {step_losses}")
 
 
     def test_epoch(self, x_batches, y_batches):
