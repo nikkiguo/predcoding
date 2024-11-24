@@ -3,7 +3,7 @@
 
 import numpy as np
 import torch
-
+import os
 import mnist_utils
 import functions as F
 from network import PredictiveCodingNetwork
@@ -52,27 +52,36 @@ def main(cf):
         for epoch in range(cf.n_epochs):
             print(f"\nepoch {epoch}")
 
-            img_batches, label_batches = mnist_utils.get_batches(img_train, label_train, cf.batch_size)
+            img_batches, label_batches = mnist_utils.get_batches(img_train, label_train, cf.batch_size, cf.percent_data_used, cf.subsample_idx)
             print(f"training on {len(img_batches)} batches of size {cf.batch_size}")
             model.train_epoch(img_batches, label_batches, epoch_num=epoch)
 
-            img_batches, label_batches = mnist_utils.get_batches(img_test, label_test, cf.batch_size)
+            img_batches, label_batches = mnist_utils.get_batches(img_test, label_test, cf.batch_size, cf.percent_data_used, cf.subsample_idx)
             print(f"testing on {len(img_batches)} batches of size {cf.batch_size}")
             accs = model.test_epoch(img_batches, label_batches)
             print(f"average accuracy {np.mean(np.array(accs))}")
 
-            np.random.seed(20)
+            np.random.seed(cf.seed)
             perm = np.random.permutation(img_train.shape[1])
             img_train = img_train[:, perm]
             label_train = label_train[:, perm]
+
+    # Save model state_dict
+    filepath = "models/"
+    filename = f'net_{cf.act_fn}_{cf.optim}_seed{cf.seed}_samplsize{cf.percent_data_used}_samplidx{cf.subsample_idx}.pth'
+    full_path = os.path.join(filepath, filename)
+    model.save(full_path)
 
 
 if __name__ == "__main__":
     cf = AttrDict()
 
-    cf.n_epochs = 10
+    cf.n_epochs = 1
     cf.data_size = None
     cf.batch_size = 128
+    cf.seed = 20
+    cf.percent_data_used = 0.2
+    cf.subsample_idx = 1
 
     cf.apply_inv = True
     cf.apply_scaling = True

@@ -3,7 +3,7 @@
 
 import numpy as np
 import torch
-
+import pickle
 import mnist_utils
 import functions as F
 
@@ -14,6 +14,7 @@ def set_tensor(arr, device):
 
 class PredictiveCodingNetwork(object):
     def __init__(self, cf):
+        self.seed = cf.seed
         self.device = cf.device
         self.n_layers = cf.n_layers
         self.act_fn = cf.act_fn
@@ -178,7 +179,7 @@ class PredictiveCodingNetwork(object):
             else:
                 raise ValueError(f"{self.act_fn} not supported")
 
-            np.random.seed(20)
+            np.random.seed(self.seed)
             layer_w = np.random.uniform(-1, 1, size=(self.neurons[l + 1], self.neurons[l])) * norm_w
             layer_b = np.zeros((self.neurons[l + 1], 1)) + norm_b * np.ones((self.neurons[l + 1], 1))
             weights[l] = set_tensor(layer_w, self.device)
@@ -228,4 +229,9 @@ class PredictiveCodingNetwork(object):
 
         else:
             raise ValueError(f"{self.optim} not supported")
+
+    def save(self, filepath):
+        with open(filepath, 'wb') as f:
+            pickle.dump(self, f)
+        print(f"Model saved to {filepath}")
 

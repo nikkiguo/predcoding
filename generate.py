@@ -52,16 +52,16 @@ def main(cf):
         for epoch in range(cf.n_epochs):
             print(f"\nepoch {epoch}")
 
-            img_batches, label_batches = mnist_utils.get_batches(img_train, label_train, cf.batch_size)
+            img_batches, label_batches = mnist_utils.get_batches(img_train, label_train, cf.batch_size, cf.percent_data_used)
             print(f"training on {len(img_batches)} batches of size {cf.batch_size}")
             model.train_epoch(label_batches, img_batches, epoch_num=epoch)
 
-            img_batches, label_batches = mnist_utils.get_batches(img_test, label_test, cf.batch_size)
+            img_batches, label_batches = mnist_utils.get_batches(img_test, label_test, cf.batch_size, cf.percent_data_used)
             print("generating images...")
             pred_imgs = model.generate_data(label_batches[0])
             mnist_utils.plot_imgs(pred_imgs, cf.img_path.format(epoch))
 
-            np.random.seed(20)
+            np.random.seed(cf.seed)
             perm = np.random.permutation(img_train.shape[1])
             img_train = img_train[:, perm]
             label_train = label_train[:, perm]
@@ -72,6 +72,8 @@ if __name__ == "__main__":
 
     cf.img_path = "imgs/{}.png"
     cf.img_path_og = "imgs/{}_og.png"
+    cf.seed = 20
+    cf.percent_data_used = 0.2
 
     cf.n_epochs = 10
     cf.data_size = None
