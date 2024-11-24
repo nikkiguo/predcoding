@@ -105,16 +105,15 @@ if __name__ == "__main__":
     cf.apply_scaling = True
     cf.label_scale = 0.94
     cf.img_scale = 1.0
-
+    
     if (not args.data) or (args.data == "mnist"): # default is mnist
         cf.dataset = "mnist"
-        cf.neurons = [784, 500, 500, 10]
     elif args.data == "fashion_mnist":
         cf.dataset = args.data
-        cf.neurons = [784, 128, 128, 128, 10]
+        
     # elif args.data == "cifar10":
     #     print("Using cifar10 dataset")
-
+    cf.neurons = [784, 128, 128, 128, 10]
     cf.n_layers = len(cf.neurons)
     cf.act_fn = F.RELU
     cf.var_out = 1
