@@ -65,7 +65,15 @@ def main(cf):
             perm = np.random.permutation(img_train.shape[1])
             img_train = img_train[:, perm]
             label_train = label_train[:, perm]
-
+    
+# calculate the inception score for p(y|x)
+def calculate_inception_score(p_yx, eps=1E-16):
+	p_y = np.expand_dims(p_yx.mean(axis=0), 0) # calculate p(y)
+	kl_d = p_yx * (np.log(p_yx + eps) - np.log(p_y + eps)) # kl divergence for each image
+	sum_kl_d = kl_d.sum(axis=1) # sum over classes
+	avg_kl_d = np.mean(sum_kl_d) # average over images
+	is_score = np.exp(avg_kl_d) # undo the logs
+	return is_score
 
 if __name__ == "__main__":
     cf = AttrDict()
