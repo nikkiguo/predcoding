@@ -6,6 +6,7 @@ import torch
 
 import mnist_utils
 import functions as F
+import torch.nn.functional as Func
 
 
 def set_tensor(arr, device):
@@ -43,6 +44,8 @@ class PredictiveCodingNetwork(object):
         self._init_params()
 
     def train_epoch(self, x_batches, y_batches, epoch_num=None):
+        total_loss = 0.0
+        step_losses = []  # List to store loss per step
         n_batches = len(x_batches)
         for batch_id, (x_batch, y_batch) in enumerate(zip(x_batches, y_batches)):
 
@@ -61,9 +64,24 @@ class PredictiveCodingNetwork(object):
             x[self.n_layers - 1] = y_batch
 
             x, errors, _ = self.infer(x, batch_size)
+
+            batch_loss = 0.0
+            for l in range(1, self.n_layers):
+                batch_loss += torch.mean(errors[l] ** 2)  # Mean Squared Ereror
+
+            total_loss += batch_loss.item()
+            step_losses.append(batch_loss.item())
+
+
             self.update_params(
                 x, errors, batch_size, epoch_num=epoch_num, n_batches=n_batches, curr_batch=batch_id
             )
+
+        average_loss = total_loss / n_batches
+        print(f"Epoch {epoch_num}: Average Loss = {average_loss:.6f}")
+
+        print(f"Step losses: {step_losses}")
+
 
     def test_epoch(self, x_batches, y_batches):
         accs = []
@@ -132,7 +150,6 @@ class PredictiveCodingNetwork(object):
                 # eq. 2.17
                 errors[l] = (x[l] - self.W[l - 1] @ f_x - self.b[l - 1]) / self.vars[l]
                 f = f - self.vars[l] * torch.sum(torch.mul(errors[l], errors[l]), dim=0)
-
             diff = f - f_0
             threshold = self.condition * self.beta / self.vars[self.n_layers - 1]
             if torch.any(diff < 0):
@@ -188,6 +205,11 @@ class PredictiveCodingNetwork(object):
             self.c_w[l] = torch.zeros_like(self.W[l])
             self.v_b[l] = torch.zeros_like(self.b[l])
             self.v_w[l] = torch.zeros_like(self.W[l])
+        
+        # for l in range(self.n_layers - 1):
+        #     print(f"Layer {l}: {self.neurons[l]} -> {self.neurons[l+1]}")
+
+
 
     def _apply_gradients(self, grad_w, grad_b, epoch_num=None, n_batches=None, curr_batch=None):
 
