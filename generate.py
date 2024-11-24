@@ -71,6 +71,7 @@ if __name__ == "__main__":
     cf = AttrDict()
 
     cf.img_path = "imgs/{}.png"
+    cf.img_path_og = "imgs/{}_og.png"
 
     cf.n_epochs = 10
     cf.data_size = None

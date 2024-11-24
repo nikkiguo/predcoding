@@ -195,7 +195,7 @@ class PredictiveCodingNetwork(object):
 
     def _apply_gradients(self, grad_w, grad_b, epoch_num=None, n_batches=None, curr_batch=None):
 
-        if self.optim is "RMSPROP":
+        if self.optim == "RMSPROP":
             for l in range(self.n_layers - 1):
                 grad_b[l] = grad_b[l].unsqueeze(dim=1)
                 self.c_w[l] = self.decay_r * self.c_w[l] + (1 - self.decay_r) * grad_w[l] ** 2
@@ -204,7 +204,7 @@ class PredictiveCodingNetwork(object):
                 self.W[l] = self.W[l] + self.l_rate * (grad_w[l] / (torch.sqrt(self.c_w[l]) + self.eps))
                 self.b[l] = self.b[l] + self.l_rate * (grad_b[l] / (torch.sqrt(self.c_b[l]) + self.eps))
 
-        elif self.optim is "ADAM":
+        elif self.optim == "ADAM":
             for l in range(self.n_layers - 1):
                 grad_b[l] = grad_b[l].unsqueeze(dim=1)
                 self.c_b[l] = self.beta_1 * self.c_b[l] + (1 - self.beta_1) * grad_b[l]
@@ -221,7 +221,7 @@ class PredictiveCodingNetwork(object):
                     torch.sqrt(self.v_b[l]) + self.eps
                 )
 
-        elif self.optim is "SGD" or self.optim is None:
+        elif self.optim == "SGD" or self.optim is None:
             for l in range(self.n_layers - 1):
                 self.W[l] = self.W[l] + self.l_rate * grad_w[l]
                 self.b[l] = self.b[l] + self.l_rate * grad_b[l].unsqueeze(dim=1)

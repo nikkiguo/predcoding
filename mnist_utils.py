@@ -86,6 +86,24 @@ def plot_imgs(img_batch, save_path):
         axes[i].set_axis_off()
     plt.savefig(save_path)
     plt.close('all') 
+    
+def plot_images_total(imgs_list, save_path):
+
+    for row_idx, img_tensor in enumerate(imgs_list):
+        img_batch = img_tensor.detach().cpu().numpy()
+        batch_size = img_tensor.shape[1]
+        dim = nearest_square(batch_size)
+
+        imgs = [np.reshape(img_batch[:, i], [28, 28]) for i in range(dim ** 2)]
+        _, axes = plt.subplots(dim, dim)
+        axes = axes.flatten()
+        for i, img in enumerate(imgs):
+            axes[i].imshow(img)
+            axes[i].set_axis_off()
+
+    plt.tight_layout()
+    plt.savefig(save_path)
+    plt.close('all') 
 
 
 def nearest_square(limit):
