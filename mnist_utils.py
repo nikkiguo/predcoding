@@ -15,6 +15,13 @@ def get_mnist_test_set():
     return torchvision.datasets.MNIST("MNIST_test", download=True, train=False)
 
 
+def get_fashion_mnist_train_set():
+    return torchvision.datasets.FashionMNIST(root="Fashion_MNIST_train", train=True, download=True)
+        
+
+def get_fashion_mnist_test_set():
+    return torchvision.datasets.FashionMNIST(root="Fashion_MNIST_test", train=False, download=True)
+
 def onehot(label, n_classes=10):
     arr = np.zeros([10])
     arr[int(label)] = 1.0
@@ -51,10 +58,10 @@ def mnist_accuracy(pred_labels, labels):
             correct += 1
     return correct / batch_size
 
-
-def get_batches(imgs, labels, batch_size):
+"""
+def get_batches(imgs, labels, batch_size, percent_data_used=1):
     n_data = imgs.shape[1]
-    n_batches = int(np.ceil(n_data / batch_size))
+    n_batches = int(np.ceil(n_data / batch_size * percent_data_used)) # only use 20% of data
 
     img_batches = [[] for _ in range(n_batches)]
     label_batches = [[] for _ in range(n_batches)]
@@ -71,6 +78,32 @@ def get_batches(imgs, labels, batch_size):
             label_batches[batch] = labels[:, start:end]
 
     return img_batches, label_batches
+"""
+def get_batches(imgs, labels, batch_size, percent_data_used=1, subsample_idx=0):
+    n_data = imgs.shape[1]
+    total_batches = int(np.ceil(n_data / batch_size))  # total number of batches in the data
+    n_batches = int(np.ceil(total_batches * percent_data_used))  # only use certain% of data
+
+    # Calculate the offset for the desired data chunk (e.g., second 20%)
+    # subsample_idx 0 means first 20%, 1 means second 20%, etc.
+    offset = subsample_idx * n_batches
+
+    img_batches = [[] for _ in range(n_batches)]
+    label_batches = [[] for _ in range(n_batches)]
+
+    for batch in range(n_batches):
+        adjusted_batch = offset + batch  # index into the correct section of the data
+        if adjusted_batch >= total_batches:
+            break  # Ensure we don't go out of bounds
+
+        start = adjusted_batch * batch_size
+        end = min((adjusted_batch + 1) * batch_size, n_data)  # avoid overflow on the last batch
+
+        img_batches[batch] = imgs[:, start:end]
+        label_batches[batch] = labels[:, start:end]
+
+    return img_batches, label_batches
+
 
 
 def plot_imgs(img_batch, save_path):
@@ -84,6 +117,24 @@ def plot_imgs(img_batch, save_path):
     for i, img in enumerate(imgs):
         axes[i].imshow(img)
         axes[i].set_axis_off()
+    plt.savefig(save_path)
+    plt.close('all') 
+    
+def plot_images_total(imgs_list, save_path):
+
+    for row_idx, img_tensor in enumerate(imgs_list):
+        img_batch = img_tensor.detach().cpu().numpy()
+        batch_size = img_tensor.shape[1]
+        dim = nearest_square(batch_size)
+
+        imgs = [np.reshape(img_batch[:, i], [28, 28]) for i in range(dim ** 2)]
+        _, axes = plt.subplots(dim, dim)
+        axes = axes.flatten()
+        for i, img in enumerate(imgs):
+            axes[i].imshow(img)
+            axes[i].set_axis_off()
+
+    plt.tight_layout()
     plt.savefig(save_path)
     plt.close('all') 
 

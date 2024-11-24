@@ -3,7 +3,7 @@
 
 import numpy as np
 import torch
-
+import pickle
 import mnist_utils
 import functions as F
 import torch.nn.functional as Func
@@ -15,6 +15,7 @@ def set_tensor(arr, device):
 
 class PredictiveCodingNetwork(object):
     def __init__(self, cf):
+        self.seed = cf.seed
         self.device = cf.device
         self.n_layers = cf.n_layers
         self.act_fn = cf.act_fn
@@ -188,10 +189,14 @@ class PredictiveCodingNetwork(object):
                 norm_w = np.sqrt(6 / (self.neurons[l + 1] + self.neurons[l]))
             elif self.act_fn is F.LOGSIG:
                 norm_w = 4 * np.sqrt(6 / (self.neurons[l + 1] + self.neurons[l]))
+            elif self.act_fn is F.RELU:
+                norm_w = np.sqrt(2 / self.neurons[l]) # he initialization
+            elif self.act_fn is F.LEAKY_RELU:
+                norm_w = np.sqrt(2 / (1 + F.L_RELU_SLOPE) * 1 / self.neurons[l])  # Adjusted He initialization
             else:
                 raise ValueError(f"{self.act_fn} not supported")
 
-            np.random.seed(20)
+            np.random.seed(self.seed)
             layer_w = np.random.uniform(-1, 1, size=(self.neurons[l + 1], self.neurons[l])) * norm_w
             layer_b = np.zeros((self.neurons[l + 1], 1)) + norm_b * np.ones((self.neurons[l + 1], 1))
             weights[l] = set_tensor(layer_w, self.device)
@@ -213,7 +218,7 @@ class PredictiveCodingNetwork(object):
 
     def _apply_gradients(self, grad_w, grad_b, epoch_num=None, n_batches=None, curr_batch=None):
 
-        if self.optim is "RMSPROP":
+        if self.optim == "RMSPROP":
             for l in range(self.n_layers - 1):
                 grad_b[l] = grad_b[l].unsqueeze(dim=1)
                 self.c_w[l] = self.decay_r * self.c_w[l] + (1 - self.decay_r) * grad_w[l] ** 2
@@ -222,7 +227,7 @@ class PredictiveCodingNetwork(object):
                 self.W[l] = self.W[l] + self.l_rate * (grad_w[l] / (torch.sqrt(self.c_w[l]) + self.eps))
                 self.b[l] = self.b[l] + self.l_rate * (grad_b[l] / (torch.sqrt(self.c_b[l]) + self.eps))
 
-        elif self.optim is "ADAM":
+        elif self.optim == "ADAM":
             for l in range(self.n_layers - 1):
                 grad_b[l] = grad_b[l].unsqueeze(dim=1)
                 self.c_b[l] = self.beta_1 * self.c_b[l] + (1 - self.beta_1) * grad_b[l]
@@ -239,11 +244,16 @@ class PredictiveCodingNetwork(object):
                     torch.sqrt(self.v_b[l]) + self.eps
                 )
 
-        elif self.optim is "SGD" or self.optim is None:
+        elif self.optim == "SGD" or self.optim is None:
             for l in range(self.n_layers - 1):
                 self.W[l] = self.W[l] + self.l_rate * grad_w[l]
                 self.b[l] = self.b[l] + self.l_rate * grad_b[l].unsqueeze(dim=1)
 
         else:
             raise ValueError(f"{self.optim} not supported")
+
+    def save(self, filepath):
+        with open(filepath, 'wb') as f:
+            pickle.dump(self, f)
+        print(f"Model saved to {filepath}")
 
