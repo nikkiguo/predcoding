@@ -15,6 +15,13 @@ def get_mnist_test_set():
     return torchvision.datasets.MNIST("MNIST_test", download=True, train=False)
 
 
+def get_fashion_mnist_train_set():
+    return torchvision.datasets.FashionMNIST(root="Fashion_MNIST_train", train=True, download=True)
+        
+
+def get_fashion_mnist_test_set():
+    return torchvision.datasets.FashionMNIST(root="Fashion_MNIST_test", train=False, download=True)
+
 def onehot(label, n_classes=10):
     arr = np.zeros([10])
     arr[int(label)] = 1.0

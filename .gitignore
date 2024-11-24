@@ -6,5 +6,7 @@ __pycache__/
 .ipynb_checkpoints
 MNIST_train/
 MNIST_test/
+Fashion_MNIST_train/
+Fashion_MNIST_test/
 imgs/
 data/
