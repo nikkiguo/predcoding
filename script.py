@@ -113,7 +113,7 @@ if __name__ == "__main__":
     # elif args.data == "cifar10":
     #     print("Using cifar10 dataset")
 
-    cf.neurons = [784, 128, 128, 128, 10]
+    cf.neurons = [784, 500, 500, 10]
         
     cf.n_layers = len(cf.neurons)
     cf.act_fn = F.RELU
